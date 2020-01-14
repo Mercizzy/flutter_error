@@ -12,6 +12,8 @@ class _TextFieldErrorPageState extends State<TextFieldErrorPage> {
 
   var _a1 = Alignment.centerRight;
   var _a2 = Alignment.centerLeft;
+  var _o1 = 1.0;
+  bool _isShowClear = true;
 
   @override
   void initState() { 
@@ -19,29 +21,40 @@ class _TextFieldErrorPageState extends State<TextFieldErrorPage> {
     _focusNode.addListener(() {
       if(_focusNode.hasFocus) {
         setState(() {
+          print('点击搜索框');
           _a1 = Alignment.centerLeft;
-          _a1 = Alignment.centerRight;
+          _a2 = Alignment.centerRight;
+          _o1 = 0.0;
         });
       }else {
         if(_textEditingController.text == '') {
+          print('离开搜索框');
           setState(() {
             _a1 = Alignment.centerRight;
             _a2 = Alignment.centerLeft;
+            _o1 = 1.0;
           });
         }
         
       }
     });
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _textEditingController.dispose();
+    _focusNode.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
         //触摸收起键盘
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      onPanCancel: () {
+        print('3333');
         FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Container(
@@ -60,62 +73,76 @@ class _TextFieldErrorPageState extends State<TextFieldErrorPage> {
             child: Stack(
               children: <Widget>[
                 TextField(
-                  focusNode: _focusNode,
-                  controller: _textEditingController,
-                  decoration: InputDecoration(
-                    // labelText: '测试'
-                    contentPadding: EdgeInsets.fromLTRB(40, 10, 40, 10),
-                    border: InputBorder.none,
+                    focusNode: _focusNode,
+                    controller: _textEditingController,
+                    decoration: InputDecoration(
+                      // labelText: '测试'
+                      contentPadding: EdgeInsets.fromLTRB(40, 10, 40, 10),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (str) {
+                      setState(() {
+                        _isShowClear = str == '';
+                      });
+                    },
                   ),
-                ),
-                // Positioned(
-                //   right: 20,
-                //   child: Container(
-                //     width: 20,
-                //     height: 36,
-                //     alignment: Alignment.center,
-                //     // color: Colors.red,
-                //     child: InkWell(
-                //       onTap: () {
-                //         setState(() {
-                //           _textEditingController.text = '';
-                //         });
-                //       },
-                //       child: Icon(CupertinoIcons.clear_thick_circled),
-                //     ),
-                //   ),
-                // ),
-                
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: Container(
-                        height: 36,
-                        child: AnimatedAlign(
-                          duration: Duration(milliseconds: 500),
-                          alignment: _a1,
-                          child: InkWell(
-                            onTap: () {},
+                      child: GestureDetector(
+                        onTap: () {
+                          _focusNode.requestFocus();
+                        },
+                        child: Container(
+                          height: 36,
+                          child: AnimatedAlign(
+                            duration: Duration(milliseconds: 500),
+                            alignment: _a1,
                             child: Icon(CupertinoIcons.search),
                           ),
                         ),
-                      ),
+                      )
                     ),
                     Expanded(
-                      child: Container(
-                        height: 36,
-                        child: AnimatedAlign(
-                          duration: Duration(milliseconds: 500),
-                          alignment: _a2,
-                          child: InkWell(
-                            onTap: () {},
-                            child: Text('搜索'),
+                      child: GestureDetector(
+                        onTap: () {
+                          _focusNode.requestFocus();
+                        },
+                        child: Container(
+                          height: 36,
+                          child: AnimatedAlign(
+                            duration: Duration(milliseconds: 500),
+                            alignment: _a2,
+                            child: AnimatedOpacity(
+                              child: Text('搜索'),
+                              duration: Duration(milliseconds: 500),
+                              opacity: _o1,
+                            ),
                           ),
                         ),
-                      ),
+                      )
                     ),
                   ],
-                )
+                ),
+                
+                Positioned(
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _textEditingController.text = '';
+                        _isShowClear = true;
+                      });
+                    },
+                    child: Offstage(
+                      offstage: _isShowClear,
+                      child: Container(
+                        height: 36,
+                        child: Icon(Icons.clear),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             )
           ),

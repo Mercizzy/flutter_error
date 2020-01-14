@@ -10,8 +10,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
   @override
   Widget build(BuildContext context) {
+    print('-----------------看看会不会触发我-------------------------');
     return Container(
       child: MaterialApp(
         title: 'flutter错题集',
